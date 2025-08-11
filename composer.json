@@ -1,0 +1,34 @@
+{
+  "name": "monobank/acquiring",
+  "description": "Monobank Acquiring API PHP SDK",
+  "type": "library",
+  "version": "1.0.0",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Monobank\\Acquiring\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Monobank\\Acquiring\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
+  },
+  "require": {
+    "php": ">=8.1",
+    "ext-filter": "*",
+    "ext-hash": "*",
+    "ext-json": "*",
+    "ext-openssl": "*",
+    "ext-mbstring": "*",
+    "psr/http-client": "^1.0",
+    "psr/http-factory": "^1.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10"
+  }
+}
