@@ -1,4 +1,4 @@
-name: PHP Composer
+name: PHP CI
 
 on:
   push:
@@ -10,30 +10,133 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  validate:
+    name: Validate composer
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+  test:
+    name: Test PHP ${{ matrix.php-versions }}
+    runs-on: ${{ matrix.operating-system }}
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['8.1', '8.2', '8.3', '8.4']
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, intl, json, zip, openssl
+          coverage: xdebug
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
 
-    # - name: Run test suite
-    #   run: composer run-script test
+      - name: Run test suite
+        run: composer run-script test
+
+      - name: Generate code coverage report
+        run: |
+          XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+
+  static-analysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: phpcs, phpstan, phpmd
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run PHP_CodeSniffer
+        run: phpcs --standard=PSR12 src/ tests/
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse -l 5 src/
+        if: always()
+
+      - name: Run PHP Mess Detector
+        run: phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
+        if: always()
+
+  scrutinizer:
+    name: Scrutinizer Analysis
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: xdebug
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run tests with coverage for Scrutinizer
+        run: |
+          XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Upload coverage to Scrutinizer
+        uses: sudo-bot/action-scrutinizer@latest
+        with:
+          cli-args: "--format=php-clover coverage.xml"
+
+  php-intelligence:
+    name: PHP Intelligence Check
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2, infection
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+#
+#      - name: Run Infection for Mutation Testing
+#        run: |
+#          vendor/bin/infection --min-msi=80 --min-covered-msi=80 --threads=4 --only-covered
+#        continue-on-error: true
