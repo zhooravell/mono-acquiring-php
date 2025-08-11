@@ -42,7 +42,7 @@ use Monobank\Acquiring\Response\GetPublicKeyResponse;
 use Monobank\Acquiring\Response\GetQrTerminalInfoResponse;
 use Monobank\Acquiring\Response\GetQrTerminalListResponse;
 use Monobank\Acquiring\Response\GetReceiptResponse;
-use Monobank\Acquiring\Response\GetSplitPaymentRecipientListResponse;
+use Monobank\Acquiring\Response\GetSplitPaymentReceiverListResponse;
 use Monobank\Acquiring\Response\GetStatementByPeriodResponse;
 use Monobank\Acquiring\Response\SubMerchantListResponse;
 use Monobank\Acquiring\ValueObject\APIToken;
@@ -363,7 +363,7 @@ final class Client implements ClientInterface
      * @throws JsonException
      * @throws MonobankAcquiringException
      */
-    public function getSplitPaymentRecipientList(): GetSplitPaymentRecipientListResponse
+    public function getSplitPaymentReceiverList(): GetSplitPaymentReceiverListResponse
     {
         $httpResponse = $this->client->sendRequest(
             $this->createRequest('GET', '/api/merchant/split-receiver/list')
@@ -371,7 +371,7 @@ final class Client implements ClientInterface
 
         self::checkErrors($httpResponse);
 
-        return new GetSplitPaymentRecipientListResponse(
+        return new GetSplitPaymentReceiverListResponse(
             json_decode($httpResponse->getBody()->getContents(), true, flags: JSON_THROW_ON_ERROR),
         );
     }

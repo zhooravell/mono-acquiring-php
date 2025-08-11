@@ -4,20 +4,27 @@ declare(strict_types=1);
 
 namespace Monobank\Acquiring\Tests\Client;
 
-use Monobank\Acquiring\ValueObject\SplitReceiver;
+use Monobank\Acquiring\Exception\ForbiddenException;
+use Monobank\Acquiring\Exception\MonobankAcquiringException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class GetSplitPaymentRecipientListSuccessTest extends BaseClientTestCase
+class GetSplitPaymentReceiverListFailureTest extends BaseClientTestCase
 {
-    public function test(): void
-    {
-        $content = [
-            'list' => [
-                ['splitReceiverId' => 'sr_aB3dC5eF7g', 'name' => 'ФОП Іванов Іван Іванович'],
-            ],
-        ];
+    #[DataProvider('errorsDataProvider')]
+    public function test(
+        int $httpStatusCode,
+        string $errorCode,
+        string $errorMessage,
+        string $exceptionClass,
+        int $exceptionCode,
+    ): void {
+        $this->expectException($exceptionClass);
+        $this->expectException(MonobankAcquiringException::class);
+        $this->expectExceptionCode($exceptionCode);
+        $this->expectExceptionMessage($errorMessage);
 
         $httpRequest = $this->createMock(RequestInterface::class);
         $httpRequest
@@ -34,12 +41,12 @@ class GetSplitPaymentRecipientListSuccessTest extends BaseClientTestCase
         $response = $this->createMock(ResponseInterface::class);
         $response->expects(self::any())
             ->method('getStatusCode')
-            ->willReturn(200);
+            ->willReturn($httpStatusCode);
 
         $stream = $this->createMock(StreamInterface::class);
         $stream->expects(self::any())
             ->method('getContents')
-            ->willReturn(json_encode($content));
+            ->willReturn(json_encode(['errCode' => $errorCode, 'errText' => $errorMessage]));
 
         $response->expects(self::any())
             ->method('getBody')
@@ -51,10 +58,12 @@ class GetSplitPaymentRecipientListSuccessTest extends BaseClientTestCase
             ->with($httpRequest)
             ->willReturn($response);
 
-        $response = $this->client->getSplitPaymentRecipientList();
-        $list = $response->getList();
+        try {
+            $this->client->getSplitPaymentReceiverList();
+        } catch (ForbiddenException $e) {
+            self::assertSame($errorCode, $e->getErrorCode());
 
-        self::assertCount(1, $list);
-        self::assertContainsOnlyInstancesOf(SplitReceiver::class, $list);
+            throw $e;
+        }
     }
 }

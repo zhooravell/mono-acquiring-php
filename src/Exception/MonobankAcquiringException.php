@@ -34,4 +34,5 @@ interface MonobankAcquiringException extends Throwable
     public const INTERNAL_SERVER_ERROR_CODE = 3003;
     public const UNEXPECTED_ERROR_CODE = 3004;
     public const BAD_REQUEST_ERROR_CODE = 3005;
+    public const WEBHOOK_VERIFICATION_ERROR_CODE = 3006;
 }

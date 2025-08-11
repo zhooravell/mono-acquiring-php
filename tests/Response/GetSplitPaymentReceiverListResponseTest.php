@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Monobank\Acquiring\Tests\Response;
 
-use Monobank\Acquiring\Response\GetSplitPaymentRecipientListResponse;
+use Monobank\Acquiring\Response\GetSplitPaymentReceiverListResponse;
 use Monobank\Acquiring\ValueObject\SplitReceiver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class GetSplitPaymentRecipientListResponseTest extends TestCase
+class GetSplitPaymentReceiverListResponseTest extends TestCase
 {
     #[DataProvider('emptyListProvider')]
     public function testEmptyList(array $data): void
     {
-        $response = new GetSplitPaymentRecipientListResponse($data);
+        $response = new GetSplitPaymentReceiverListResponse($data);
 
         self::assertCount(0, $response->getList());
     }
@@ -36,7 +36,7 @@ class GetSplitPaymentRecipientListResponseTest extends TestCase
             ],
         ];
 
-        $response = new GetSplitPaymentRecipientListResponse($data);
+        $response = new GetSplitPaymentReceiverListResponse($data);
         $list = $response->getList();
 
         self::assertCount(2, $list);

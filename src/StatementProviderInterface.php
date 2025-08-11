@@ -12,7 +12,7 @@ use Monobank\Acquiring\Response\GetStatementByPeriodResponse;
  * @see https://monobank.ua/api-docs/acquiring/dodatkova-funktsionalnist/vypyska/get--api--merchant--statement
  * @see https://monobank.ua/api-docs/acquiring/intehratory/marketpleisy-ta-ahenstka-skhema/get--api--merchant--statement
  */
-interface StatementFetcherInterface
+interface StatementProviderInterface
 {
     public function getStatementByPeriod(GetStatementByPeriodRequest $request): GetStatementByPeriodResponse;
 }

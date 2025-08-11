@@ -9,7 +9,7 @@ use Monobank\Acquiring\ValueObject\SplitReceiver;
 /**
  * @see https://monobank.ua/api-docs/acquiring/metody/rozshcheplennia/get--api--merchant--split-receiver--list
  */
-class GetSplitPaymentRecipientListResponse extends AbstractResponse
+class GetSplitPaymentReceiverListResponse extends AbstractResponse
 {
     /**
      * @return SplitReceiver[]

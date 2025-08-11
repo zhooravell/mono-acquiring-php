@@ -27,9 +27,9 @@ final class CreateTokenPaymentRequest extends AbstractRequest
      */
     public function __construct(string $cardToken, int $amount, Currency $currency, InitiationKind $initiationKind)
     {
-        $invoiceId = trim(strip_tags($cardToken));
+        $cardToken = trim(strip_tags($cardToken));
 
-        if (empty($invoiceId)) {
+        if (empty($cardToken)) {
             throw InvalidCardTokenException::blankValue();
         }
 
