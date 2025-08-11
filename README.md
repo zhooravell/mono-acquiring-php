@@ -1,5 +1,8 @@
 Monobank Acquiring PHP SDK
 ==========================
+[![PHP CI](https://github.com/zhooravell/mono-acquiring-php/actions/workflows/php.yml/badge.svg)](https://github.com/zhooravell/mono-acquiring-php/actions/workflows/php.yml)
+
+
 > A simple and lightweight PHP library for working with the Monobank Acquiring API.
 > It allows you to easily create payment links, track transaction statuses, and retrieve financial reports.
 
