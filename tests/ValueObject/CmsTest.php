@@ -14,7 +14,7 @@ class CmsTest extends TestCase
         $cms = new Cms();
 
         self::assertEquals('PHP SDK', $cms->getName());
-        self::assertEquals('1.0.0', $cms->getVersion());
+        self::assertEquals('dev-main', $cms->getVersion());
     }
 
     public function testCustomCms(): void
