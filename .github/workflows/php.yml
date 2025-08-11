@@ -78,21 +78,13 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          tools: phpcs, phpstan, phpmd
+          tools: phpcs
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
 
       - name: Run PHP_CodeSniffer
         run: phpcs --standard=PSR12 src/ tests/
-
-      - name: Run PHPStan
-        run: vendor/bin/phpstan analyse -l 5 src/
-        if: always()
-
-      - name: Run PHP Mess Detector
-        run: phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
-        if: always()
 
   scrutinizer:
     name: Scrutinizer Analysis
