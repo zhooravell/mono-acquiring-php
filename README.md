@@ -56,7 +56,3 @@ phpcs --standard=PSR12 src/ tests/
 * [Monobank Acquiring](https://monobank.ua/api-docs)
 * [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html)
 * [ISO 3166-1](https://www.iso.org/iso-3166-country-codes.html)
-
-<p align="center">
-<img src="https://www.php.net/images/logos/new-php-logo.png" alt="php logo">
-</p>
